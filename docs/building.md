@@ -10,7 +10,7 @@ If you get any errors please go to [Troubleshooting](#troubleshooting).
 
 The resulting image file will be located in `target/x86_64-gtmos/debug/bootimage-gtmos.bin`
 
-You may run the image with `qemu-system-x86_64 -drive format=raw,file=target/x86_64-gtmos/debug/bootimage-gtmos.bin`
+You now may [run the os](./running.md)!
 
 ## Troubleshooting
 
