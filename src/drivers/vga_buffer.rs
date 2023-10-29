@@ -7,7 +7,7 @@ use spin::Mutex;
 #[allow(dead_code)]
 // enable copy semantics for the type and make it printable and comparable.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-// store each member as 8 bits. 4 bits would be more efficient but Rust 
+// store each member as 8 bits. 4 bits would be more efficient but Rust
 // does not have a `u4`.
 #[repr(u8)]
 /// Represents each VGA colour
@@ -43,7 +43,7 @@ impl ColourCode {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-// make sure this struct is laid out the same as a C struct. 
+// make sure this struct is laid out the same as a C struct.
 #[repr(C)]
 /// Represents a character on the screen with a ColourCode.
 struct ScreenChar {
@@ -65,7 +65,7 @@ struct Buffer {
     chars: [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT],
 }
 
-/// Writer is a wrapper around Buffer it keeps track of the current colour and 
+/// Writer is a wrapper around Buffer it keeps track of the current colour and
 /// the last row's column position.
 pub struct Writer {
     column_position: usize,
@@ -179,7 +179,7 @@ fn test_println_simple() {
 }
 
 #[test_case]
-/// Ensure that no panic occurs even if many lines are printed 
+/// Ensure that no panic occurs even if many lines are printed
 /// and lines are shifted off the screen
 fn test_println_many() {
     for _ in 0..200 {
