@@ -11,7 +11,6 @@
 // replace the generated test main with our own
 #![reexport_test_harness_main = "test_main"]
 
-mod vga_buffer;
 mod drivers;
 
 use core::panic::PanicInfo;
@@ -31,8 +30,8 @@ pub extern "C" fn _start() -> ! {
 #[cfg(not(test))]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    use crate::vga_buffer::Colour;
-    use crate::vga_buffer::WRITER;
+    use crate::drivers::vga_buffer::Colour;
+    use crate::drivers::vga_buffer::WRITER;
     WRITER.lock().set_colour_code(Colour::White, Colour::Red);
     print!("{}", info);
     loop {}
@@ -75,9 +74,4 @@ pub fn test_runner(tests: &[&dyn Testable]) {
         test.run(); // new
     }
     qemu::exit_qemu(qemu::QemuExitCode::Success);
-}
-
-#[test_case]
-fn trivial_assertion() {
-    assert_eq!(1, 1);
 }

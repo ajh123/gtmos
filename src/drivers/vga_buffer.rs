@@ -10,7 +10,7 @@ use spin::Mutex;
 // store each member as 8 bits. 4 bits would be more efficient but Rust 
 // does not have a `u4`.
 #[repr(u8)]
-// Represents each VGA colour
+/// Represents each VGA colour
 pub enum Colour {
     Black = 0,
     Blue = 1,
@@ -33,7 +33,7 @@ pub enum Colour {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 // make sure the same data type as Colour is used.
 #[repr(transparent)]
-// ColourCode represents a combination of foreground and background Colours.
+/// ColourCode represents a combination of foreground and background Colours.
 struct ColourCode(u8);
 
 impl ColourCode {
@@ -45,7 +45,7 @@ impl ColourCode {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 // make sure this struct is laid out the same as a C struct. 
 #[repr(C)]
-// Represents a character on the screen with a ColourCode.
+/// Represents a character on the screen with a ColourCode.
 struct ScreenChar {
     ascii_character: u8,
     colour_code: ColourCode,
@@ -57,7 +57,7 @@ const BUFFER_HEIGHT: usize = 25;
 const BUFFER_WIDTH: usize = 80;
 
 #[repr(transparent)]
-// Buffer is a 2D array of ScreenChars, it represents the screen.
+/// Buffer is a 2D array of ScreenChars, it represents the screen.
 struct Buffer {
     // this must be Volatile because rust does not know this is memory mapped IO
     // for VGA and rust will try to optimise it because it does not know the memory
@@ -65,8 +65,8 @@ struct Buffer {
     chars: [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT],
 }
 
-// Writer is a wrapper around Buffer it keeps track of the current colour and 
-// the last row's column position.
+/// Writer is a wrapper around Buffer it keeps track of the current colour and 
+/// the last row's column position.
 pub struct Writer {
     column_position: usize,
     colour_code: ColourCode,
@@ -143,7 +143,7 @@ impl fmt::Write for Writer {
 // stop one-time initialisation of statics with non-const functions because Rust does
 // not know of the VGA memory at `0xb8000` so it can't compute it's value at compile time.
 lazy_static! {
-    // Global Writer
+    /// Global Writer
     pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer {
         column_position: 0,
         colour_code: ColourCode::new(Colour::Yellow, Colour::Black),
@@ -155,7 +155,7 @@ lazy_static! {
 
 #[macro_export]
 macro_rules! print {
-    ($($arg:tt)*) => ($crate::vga_buffer::_print(format_args!($($arg)*)));
+    ($($arg:tt)*) => ($crate::drivers::vga_buffer::_print(format_args!($($arg)*)));
 }
 
 #[macro_export]
@@ -168,4 +168,32 @@ macro_rules! println {
 pub fn _print(args: fmt::Arguments) {
     use core::fmt::Write;
     WRITER.lock().write_fmt(args).unwrap();
+}
+
+// Tests
+
+#[test_case]
+/// Just prints something to the VGA buffer
+fn test_println_simple() {
+    println!("test_println_simple output");
+}
+
+#[test_case]
+/// Ensure that no panic occurs even if many lines are printed 
+/// and lines are shifted off the screen
+fn test_println_many() {
+    for _ in 0..200 {
+        println!("test_println_many output");
+    }
+}
+
+#[test_case]
+/// Verify that the printed lines really appear on the screen
+fn test_println_output() {
+    let s = "Some test string that fits on a single line";
+    println!("{}", s);
+    for (i, c) in s.chars().enumerate() {
+        let screen_char = WRITER.lock().buffer.chars[BUFFER_HEIGHT - 2][i].read();
+        assert_eq!(char::from(screen_char.ascii_character), c);
+    }
 }
