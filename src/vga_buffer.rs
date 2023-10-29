@@ -107,6 +107,10 @@ impl Writer {
         }
     }
 
+    pub fn set_colour_code(&mut self, foreground: Colour, background: Colour) {
+        self.colour_code = ColourCode::new(foreground, background);
+    }
+
     fn new_line(&mut self) {
         for row in 1..BUFFER_HEIGHT {
             for col in 0..BUFFER_WIDTH {
