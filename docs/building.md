@@ -12,6 +12,9 @@ The resulting image file will be located in `target/x86_64-gtmos/debug/bootimage
 
 You now may [run the os](./running.md)!
 
+> [!NOTE]  
+> Bonus: `cargo run` will build the os to!
+
 ## Troubleshooting
 
 ### Error: Kernel build failed
