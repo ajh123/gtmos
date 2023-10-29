@@ -1,3 +1,11 @@
+//! # GT-MOS
+//! GT-MOS is a simple operating system for the x86_64 architecture. It will contain a lot of useful
+//! features (which are not yet implemented).
+//!
+//! ## Building GT-MOS
+//! Please see the guides located at [Building](./../docs/building.md) and [Running](./../docs/running.md).
+//!
+
 #![no_std]
 #![cfg_attr(test, no_main)]
 #![feature(custom_test_frameworks)]
@@ -8,6 +16,7 @@ pub mod drivers;
 
 use core::panic::PanicInfo;
 
+#[doc(hidden)]
 pub trait Testable {
     fn run(&self) -> ();
 }
@@ -23,6 +32,7 @@ where
     }
 }
 
+#[doc(hidden)]
 pub fn test_runner(tests: &[&dyn Testable]) {
     serial_println!("Running {} tests", tests.len());
     for test in tests {
@@ -31,6 +41,7 @@ pub fn test_runner(tests: &[&dyn Testable]) {
     exit_qemu(QemuExitCode::Success);
 }
 
+#[doc(hidden)]
 pub fn test_panic_handler(info: &PanicInfo) -> ! {
     serial_println!("[failed]\n");
     serial_println!("Error: {}\n", info);
@@ -54,11 +65,13 @@ fn panic(info: &PanicInfo) -> ! {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
+#[doc(hidden)]
 pub enum QemuExitCode {
     Success = 0x10,
     Failed = 0x11,
 }
 
+#[doc(hidden)]
 pub fn exit_qemu(exit_code: QemuExitCode) {
     use x86_64::instructions::port::Port;
 
