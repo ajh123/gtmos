@@ -33,7 +33,7 @@ macro_rules! serial_print {
 }
 
 #[macro_export]
-/// Prints a message with a new line to Serial. Use this exactly like the `print` macro from the Rust
+/// Prints a message with a new line to Serial. Use this exactly like the `println` macro from the Rust
 /// standard library.
 ///
 /// ## Example
