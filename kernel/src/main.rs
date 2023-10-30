@@ -27,6 +27,8 @@ fn kernel_main(_boot_info: &'static mut bootloader_api::BootInfo) -> ! {
     loop {}
 }
 
+pub fn main() {}
+
 // This function is called on panic.
 #[cfg(not(test))]
 #[panic_handler]

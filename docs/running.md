@@ -2,18 +2,35 @@
 
 Once you have [built](./building.md) the os, there are many ways to run it:
 
-- [QEMU with raw image](#qemu-with-raw-image)
-- [Cargo run](#cargo-run)
+- [QEMU](#qemu)
+  - [BIOS](#bios)
+  - [UEFI](#uefi)
+  - [Cargo run](#cargo-run)
 - [Cargo test](#cargo-test)
 - [Real machine](#real-machine)
 
-## QEMU with raw image
+## QEMU
 
-You may run the image with `qemu-system-x86_64 -drive format=raw,file=target/x86_64-gtmos/debug/bootimage-gtmos.bin`.
+### BIOS
 
-## Cargo run
+You may run the image with `qemu-system-x86_64 -drive format=raw,file=target/debug/bios.img`.
+A release build will have `debug` replaced with `release`.
 
-You may use `cargo run` to run the image. This will open QEMU in a similar way to before.
+Additionally, you may use `cargo run --bin qemu-bios` to run the image.
+
+### UEFI
+
+You may run the image with `qemu-system-x86_64 -drive format=raw,file=target/debug/uefi.img -bios OVMF-pure-efi.fd`.
+A release build will have `debug` replaced with `release`.
+
+> [!NOTE]  
+> This assumes you have a copy of `OVMF-pure-efi.fd`.
+
+Additionally, you may use `cargo run --bin qemu-uefi` to run the image. This will have `OVMF-pure-efi.fd` included!
+
+### Cargo run
+
+You may use `cargo run` to run the image. By default it will open QEMU just like [QEMU in BIOS](#bios)
 
 > [!NOTE]  
 > Bonus: `cargo run` will build the os to!
@@ -22,6 +39,9 @@ You may use `cargo run` to run the image. This will open QEMU in a similar way t
 
 You may use `cargo test` to run the image like in [`cargo run`](#cargo-run) but it will run tests instead.
 
+> [!WARNING]  
+> Testing system is not implemented!
+
 ## Real machine
 
 On linux machine the command below may be used to write the image to a disk.
@@ -29,6 +49,9 @@ On linux machine the command below may be used to write the image to a disk.
 > [!WARNING]  
 > Be careful because **this will erase all data** on the disk!
 
-`dd if=target/x86_64-gtmos/debug/bootimage-gtmos.bin of=/dev/sdX && sync`
+- For UEFI machines: `dd if=target/debug/uefi.img of=/dev/sdX && sync`
+- For BIOS machines: `dd if=target/debug/bios.img of=/dev/sdX && sync`
+
+A release build will have `debug` replaced with `release`.
 
 You must replace the `sdX` with the device name of your disk. You may find them with `lsblk` (list block devices).

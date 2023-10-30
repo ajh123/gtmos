@@ -3,12 +3,20 @@
 The following command need to be done OUTSIDE this repository (for example your home folder):
 `rustup target add x86_64-unknown-none`
 
-Then navigate back to this repoistory and run:
-`cargo bootimage`
+Then navigate back to this repository and run:
+`cargo build`
+
+For a release build run:
+`cargo build --release`
 
 If you get any errors please go to [Troubleshooting](#troubleshooting).
 
-The resulting image file will be located in `target/x86_64-gtmos/debug/bootimage-gtmos.bin`
+For normal builds the resulting image files will be located at:
+
+* UEFI disk image at `/target/debug/uefi.img`
+* BIOS disk image at `/target/debug/bios.img`
+
+A release build will have `debug` replaced with `release`.
 
 You now may [run the os](./running.md)!
 
@@ -18,6 +26,9 @@ You now may [run the os](./running.md)!
 ## Troubleshooting
 
 ### Error: Kernel build failed
+
+> [!NOTE]  
+> This may not be relevant to the UEFI rewrite of GT-MOS.
 
 If you get an error like:
 
@@ -34,11 +45,14 @@ Then run `cargo bootimage` again.
 
 ### Error: Bootloader build failed
 
+> [!NOTE]  
+> This may not be relevant to the UEFI rewrite of GT-MOS.
+
 If you get an error like:
 
 ```text
 Caused by:
-  process didn't exit successfully: `F:\rust\gtmos\target\bootimage\bootloader\release\build\bootloader-d6ed16076e08b61f\build-script-build` (exit code: 1)
+  process didn't exit successfully: `F:/rust/gtmos/target/bootimage/bootloader/release/build/bootloader-d6ed16076e08b61f/build-script-build` (exit code: 1)
   --- stderr
   Error: llvm-tools not found
   Maybe the rustup component `llvm-tools-preview` is missing?
