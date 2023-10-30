@@ -15,10 +15,11 @@ mod drivers;
 
 use core::panic::PanicInfo;
 
-#[no_mangle]
-pub extern "C" fn _start() -> ! {
-    println!("Welcome to GT-MOS!\nGT-MOS is (c) 2023 Samuel Hulme, All rights reserved.");
-    println!("Hello World{}", "!");
+bootloader_api::entry_point!(kernel_main);
+
+fn kernel_main(_boot_info: &'static mut bootloader_api::BootInfo) -> ! {
+    // println!("Welcome to GT-MOS!\nGT-MOS is (c) 2023 Samuel Hulme, All rights reserved.");
+    // println!("Hello World{}", "!");
 
     #[cfg(test)]
     test_main();
@@ -30,10 +31,10 @@ pub extern "C" fn _start() -> ! {
 #[cfg(not(test))]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    use crate::drivers::vga_buffer::Colour;
-    use crate::drivers::vga_buffer::WRITER;
-    WRITER.lock().set_colour_code(Colour::White, Colour::Red);
-    print!("{}", info);
+    // use crate::drivers::vga_buffer::Colour;
+    // use crate::drivers::vga_buffer::WRITER;
+    // WRITER.lock().set_colour_code(Colour::White, Colour::Red);
+    // print!("{}", info);
     loop {}
 }
 

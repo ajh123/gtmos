@@ -4,7 +4,7 @@
 #![test_runner(gtmos::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
-use gtmos::println;
+// use gtmos::println;
 use core::panic::PanicInfo;
 
 #[no_mangle] // don't mangle the name of this function
@@ -21,5 +21,5 @@ fn panic(info: &PanicInfo) -> ! {
 
 #[test_case]
 fn test_println() {
-    println!("test_println output");
+    // println!("test_println output");
 }

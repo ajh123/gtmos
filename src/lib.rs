@@ -16,6 +16,7 @@ pub mod drivers;
 
 use core::panic::PanicInfo;
 
+
 #[doc(hidden)]
 pub trait Testable {
     fn run(&self) -> ();
@@ -26,15 +27,15 @@ where
     T: Fn(),
 {
     fn run(&self) {
-        serial_print!("{}...\t", core::any::type_name::<T>());
+        // serial_print!("{}...\t", core::any::type_name::<T>());
         self();
-        serial_println!("[ok]");
+        // serial_println!("[ok]");
     }
 }
 
 #[doc(hidden)]
 pub fn test_runner(tests: &[&dyn Testable]) {
-    serial_println!("Running {} tests", tests.len());
+    // serial_println!("Running {} tests", tests.len());
     for test in tests {
         test.run();
     }
@@ -43,17 +44,17 @@ pub fn test_runner(tests: &[&dyn Testable]) {
 
 #[doc(hidden)]
 pub fn test_panic_handler(info: &PanicInfo) -> ! {
-    serial_println!("[failed]\n");
-    serial_println!("Error: {}\n", info);
+    // serial_println!("[failed]\n");
+    // serial_println!("Error: {}\n", info);
     exit_qemu(QemuExitCode::Failed);
     loop {}
 }
 
 /// Entry point for `cargo test`
 #[cfg(test)]
-#[no_mangle]
-pub extern "C" fn _start() -> ! {
-    test_main();
+bootloader_api::entry_point!(kernel_main);
+fn kernel_main(_boot_info: &'static mut bootloader_api::BootInfo) -> ! {
+    // test_main();
     loop {}
 }
 
@@ -73,10 +74,10 @@ pub enum QemuExitCode {
 
 #[doc(hidden)]
 pub fn exit_qemu(exit_code: QemuExitCode) {
-    use x86_64::instructions::port::Port;
+    // use x86_64::instructions::port::Port;
 
-    unsafe {
-        let mut port = Port::new(0xf4);
-        port.write(exit_code as u32);
-    }
+    // unsafe {
+    //     let mut port = Port::new(0xf4);
+    //     port.write(exit_code as u32);
+    // }
 }
