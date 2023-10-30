@@ -1,7 +1,7 @@
 # Building image file
 
 The following command need to be done OUTSIDE this repository (for example your home folder):
-`cargo install bootimage`
+`rustup target add x86_64-unknown-none`
 
 Then navigate back to this repoistory and run:
 `cargo bootimage`
