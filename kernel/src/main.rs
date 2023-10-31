@@ -17,7 +17,19 @@ use core::panic::PanicInfo;
 
 bootloader_api::entry_point!(kernel_main);
 
-fn kernel_main(_boot_info: &'static mut bootloader_api::BootInfo) -> ! {
+
+fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
+    let framebuffer = drivers::framebuffer::init_framebuffer(boot_info);
+    let fb_ref = framebuffer.as_ref();
+
+    drivers::framebuffer::Framebuffer::fill(&mut fb_ref.unwrap().lock(), drivers::framebuffer::Pixel {
+        b: 0xFF,
+        g: 0xFF,
+        r: 0xFF,
+        channel: 0
+    });
+
+
     // println!("Welcome to GT-MOS!\nGT-MOS is (c) 2023 Samuel Hulme, All rights reserved.");
     // println!("Hello World{}", "!");
 
