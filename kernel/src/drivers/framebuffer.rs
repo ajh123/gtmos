@@ -1,6 +1,4 @@
-use core::cell::RefCell;
-
-use spin::{Mutex, MutexGuard};
+use spin::MutexGuard;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Pixel {

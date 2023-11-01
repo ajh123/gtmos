@@ -12,7 +12,9 @@ pub struct GraphicsAPI<'a> {
 
 impl<'a> GraphicsAPI<'a> {
     pub fn new(framebuffer: RefCell<FramebufferMemory<'a>>) -> Self {
-        GraphicsAPI { framebuffer }
+        GraphicsAPI {
+            framebuffer: framebuffer,
+        }
     }
 
     /// Plot a pixel at the specified location (x, y) with the given colour.
@@ -62,20 +64,5 @@ impl<'a> GraphicsAPI<'a> {
                 y += sy;
             }
         }
-    }
-
-    /// Fill the entire framebuffer with the given pixel colour.
-    pub fn fill_framebuffer(&mut self, pixel: Pixel) {
-        let width = self.framebuffer.borrow().width;
-        let height = self.framebuffer.borrow().height;
-        self.draw_filled_rectangle(0, 0, width, height, pixel);
-    }
-
-    pub fn get_width(&self) -> usize {
-        return self.framebuffer.borrow().width;
-    }
-
-    pub fn get_height(&self) -> usize {
-        return self.framebuffer.borrow().height
     }
 }
