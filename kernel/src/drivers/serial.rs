@@ -46,3 +46,10 @@ macro_rules! serial_println {
     ($fmt:expr, $($arg:tt)*) => ($crate::serial_print!(
         concat!($fmt, "\n"), $($arg)*));
 }
+
+
+#[test_case]
+/// Just prints something to the VGA buffer
+fn test_println_simple() {
+    serial_println!("test_println_simple output");
+}

@@ -7,32 +7,29 @@
 #![feature(custom_test_frameworks)]
 // Specify that the `test_runner` function should be used to run
 // tests.
-#![test_runner(gtmos::test_runner)]
+#![test_runner(kernel::test_runner)]
 // replace the generated test main with our own
 #![reexport_test_harness_main = "test_main"]
 
-mod drivers;
-mod graphics;
-
 use core::{panic::PanicInfo, cell::RefCell};
 
-use drivers::framebuffer::Pixel;
+use kernel::drivers::framebuffer::Pixel;
 
 bootloader_api::entry_point!(kernel_main);
 
-
+#[cfg(not(test))]
 fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
 
     if let Some(framebuffer) = boot_info.framebuffer.as_mut() {
         let width = {framebuffer.info().width};
         let height = {framebuffer.info().height};
-        let fb_mem = RefCell::new(drivers::framebuffer::FramebufferMemory {
+        let fb_mem = RefCell::new(kernel::drivers::framebuffer::FramebufferMemory {
             width: width,
             height: height,
             bytes_per_pixel: framebuffer.info().bytes_per_pixel,
             buffer: framebuffer.buffer_mut(),
         });
-        let graphics_api: &mut graphics::GraphicsAPI = &mut graphics::GraphicsAPI::new(fb_mem);
+        let graphics_api: &mut kernel::graphics::GraphicsAPI = &mut kernel::graphics::GraphicsAPI::new(fb_mem);
 
         // Fill the entire framebuffer with a white colour.
         graphics_api.draw_filled_rectangle(0, 0, width-1, height-1, Pixel {
@@ -59,16 +56,14 @@ fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
         });
     }
 
-    serial_println!("Welcome to GT-MOS!\nGT-MOS is (c) 2023 Samuel Hulme, All rights reserved.");
-    serial_println!("Hello World{}", "!");
+    kernel::serial_println!("Welcome to GT-MOS!\nGT-MOS is (c) 2023 Samuel Hulme, All rights reserved.");
+    kernel::serial_println!("Hello World{}", "!");
 
     #[cfg(test)]
     test_main();
 
     loop {}
 }
-
-pub fn main() {}
 
 // This function is called on panic.
 #[cfg(not(test))]
@@ -78,11 +73,12 @@ fn panic(info: &PanicInfo) -> ! {
     // use crate::drivers::vga_buffer::WRITER;
     // WRITER.lock().set_colour_code(Colour::White, Colour::Red);
     // print!("{}", info);
+    kernel::serial_println!("{}", info);
     loop {}
 }
 
 #[cfg(test)]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    gtmos::test_panic_handler(info)
+    kernel::test_panic_handler(info);
 }
