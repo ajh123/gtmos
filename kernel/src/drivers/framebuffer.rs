@@ -1,3 +1,5 @@
+use core::cell::RefCell;
+
 use spin::{Mutex, MutexGuard};
 
 #[derive(Debug, Clone, Copy)]
@@ -14,51 +16,18 @@ pub struct Pixel {
 
 /// Represents a framebuffer memory region and other metadata used to control
 /// different functions of framebuffer.
-pub struct FramebufferMemory {
+pub struct FramebufferMemory<'a> {
     /// contains a reference to framebuffer slice
-    pub buffer: &'static mut [u8],
+    pub buffer: &'a mut[u8],
     pub width: usize,
     pub height: usize,
     pub bytes_per_pixel: usize,
 }
 
+
 pub struct FramebufferIndex {
     pub x: usize,
     pub y: usize,
-}
-
-impl FramebufferMemory {
-    /// creates a new frame buffer memory region over the framebuffer area
-    /// provided by the bootloader.
-    pub fn new(boot_info: &'static mut bootloader_api::BootInfo) -> Option<Self> {
-        if let Some(framebuffer_info) = boot_info.framebuffer.as_mut() {
-            Some(FramebufferMemory {
-                width: framebuffer_info.info().width,
-                height: framebuffer_info.info().height,
-                bytes_per_pixel: framebuffer_info.info().bytes_per_pixel,
-                buffer: framebuffer_info.buffer_mut(),
-            })
-        } else {
-            // log::error!(
-            //     "Could not initialize framebuffer,
-            //      because the bootloader did not provide framebuffer info."
-            // );
-            return None;
-        }
-    }
-}
-
-/// LockedFramebuffer represents a framebuffer memory region with mutex.
-pub type LockedFramebuffer = Mutex<FramebufferMemory>;
-
-/// initializes the framebuffer
-pub(crate) fn init_framebuffer(boot_info: &'static mut bootloader_api::BootInfo) -> Option<Mutex<FramebufferMemory>> {
-    let fb_opt = FramebufferMemory::new(boot_info);
-    if fb_opt.is_none() {
-        return None;
-    }
-
-    Some(Mutex::new(fb_opt.unwrap()))
 }
 
 /// Set of control functions used for writing pixels to frame buffer
@@ -90,8 +59,8 @@ impl Framebuffer {
     }
 
     #[inline]
-    pub fn get_pixel(fb: &FramebufferMemory, index: FramebufferIndex) -> Option<Pixel> {
-        if let Some(offset) = Framebuffer::index_to_offset(fb, index) {
+    pub fn get_pixel(fb: FramebufferMemory, index: FramebufferIndex) -> Option<Pixel> {
+        if let Some(offset) = Framebuffer::index_to_offset(&fb, index) {
             return Some(Pixel {
                 b: fb.buffer[offset],
                 g: fb.buffer[offset + 1],

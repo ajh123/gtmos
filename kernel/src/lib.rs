@@ -13,6 +13,7 @@
 #![reexport_test_harness_main = "test_main"]
 
 pub mod drivers;
+pub mod graphics;
 
 use core::panic::PanicInfo;
 
