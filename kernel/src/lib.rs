@@ -28,15 +28,15 @@ where
     T: Fn(),
 {
     fn run(&self) {
-        // serial_print!("{}...\t", core::any::type_name::<T>());
+        serial_print!("{}...\t", core::any::type_name::<T>());
         self();
-        // serial_println!("[ok]");
+        serial_println!("[ok]");
     }
 }
 
 #[doc(hidden)]
 pub fn test_runner(tests: &[&dyn Testable]) {
-    // serial_println!("Running {} tests", tests.len());
+    serial_println!("Running {} tests", tests.len());
     for test in tests {
         test.run();
     }
@@ -45,8 +45,8 @@ pub fn test_runner(tests: &[&dyn Testable]) {
 
 #[doc(hidden)]
 pub fn test_panic_handler(info: &PanicInfo) -> ! {
-    // serial_println!("[failed]\n");
-    // serial_println!("Error: {}\n", info);
+    serial_println!("[failed]\n");
+    serial_println!("Error: {}\n", info);
     exit_qemu(QemuExitCode::Failed);
     loop {}
 }
@@ -57,7 +57,7 @@ bootloader_api::entry_point!(kernel_main);
 /// Entry point for `cargo test`
 #[cfg(test)]
 fn kernel_main(_boot_info: &'static mut bootloader_api::BootInfo) -> ! {
-    // test_main();
+    test_main();
     loop {}
 }
 

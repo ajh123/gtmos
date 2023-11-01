@@ -59,8 +59,8 @@ fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
         });
     }
 
-    // println!("Welcome to GT-MOS!\nGT-MOS is (c) 2023 Samuel Hulme, All rights reserved.");
-    // println!("Hello World{}", "!");
+    serial_println!("Welcome to GT-MOS!\nGT-MOS is (c) 2023 Samuel Hulme, All rights reserved.");
+    serial_println!("Hello World{}", "!");
 
     #[cfg(test)]
     test_main();

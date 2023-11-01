@@ -9,6 +9,5 @@
 //! * [Port IO (OsDev.org)](https://wiki.osdev.org/Port_IO)
 //! * [MemoryMap (x86) (OsDev.org)](https://wiki.osdev.org/Memory_Map_(x86))
 
-// pub mod serial;
-// pub mod vga_buffer;
+pub mod serial;
 pub mod framebuffer;
