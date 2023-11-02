@@ -18,6 +18,9 @@ For normal builds the resulting image files will be located at:
 
 A release build will have `debug` replaced with `release`.
 
+> [!NOTE]  
+> If you don't see the image files in their path you may need to run `cargo run  --bin gtmos`. This will run `cargo build` automatically.
+
 You now may [run the os](./running.md)!
 
 > [!NOTE]  
