@@ -34,7 +34,13 @@ pub struct Framebuffer;
 impl Framebuffer {
     #[inline]
     pub fn index_in_bounds(fb: &FramebufferMemory, index: &FramebufferIndex) -> bool {
-        index.x < fb.width && index.y < fb.height
+        let s1 = index.x <= fb.width && index.y <= fb.height;
+        if ((index.y * fb.width + index.x) * fb.bytes_per_pixel) <= fb.buffer.len() {
+            if s1 == true {
+                true;
+            }
+        }
+        return false;
     }
 
     #[inline]

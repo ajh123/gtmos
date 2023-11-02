@@ -32,7 +32,7 @@ fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
         let graphics_api: &mut kernel::graphics::GraphicsAPI = &mut kernel::graphics::GraphicsAPI::new(fb_mem);
 
         // Fill the entire framebuffer with a white colour.
-        graphics_api.draw_filled_rectangle(0, 0, width-1, height-1, Pixel {
+        graphics_api.draw_filled_rectangle(0, 0, width+1, height+1, Pixel {
             b: 0xFF,
             g: 0xFF,
             r: 0xFF,
