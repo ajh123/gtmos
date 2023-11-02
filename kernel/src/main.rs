@@ -65,8 +65,6 @@ fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
         let c = kernel::drivers::serial::receive();
         kernel::serial_print!("{}", c);
     }
-
-    loop {}
 }
 
 // This function is called on panic.
