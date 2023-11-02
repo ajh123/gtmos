@@ -19,6 +19,11 @@ pub fn _print(args: ::core::fmt::Arguments) {
     SERIAL1.lock().write_fmt(args).expect("Printing to serial failed");
 }
 
+pub fn receive() -> char  {
+    let char1 = SERIAL1.lock().receive() as char;
+    return char1;
+}
+
 #[macro_export]
 /// Prints a message to Serial. Use this exactly like the `print` macro from the Rust standard library.
 ///
