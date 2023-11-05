@@ -36,6 +36,7 @@ where
 
 #[doc(hidden)]
 pub fn test_runner(tests: &[&dyn Testable]) {
+    serial_println!("dsfuidhdfshidfhidfuidfh");
     serial_println!("Running {} tests", tests.len());
     for test in tests {
         test.run();
@@ -56,7 +57,7 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
 bootloader_api::entry_point!(kernel_main);
 /// Entry point for `cargo test`
 #[cfg(test)]
-fn kernel_main(_boot_info: &'static mut bootloader_api::BootInfo) -> ! {
+pub(crate) fn kernel_main(_boot_info: &'static mut bootloader_api::BootInfo) -> ! {
     test_main();
     loop {}
 }

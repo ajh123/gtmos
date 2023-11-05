@@ -7,29 +7,30 @@
 #![feature(custom_test_frameworks)]
 // Specify that the `test_runner` function should be used to run
 // tests.
-#![test_runner(kernel::test_runner)]
+#![test_runner(gtmos_kernel::test_runner)]
 // replace the generated test main with our own
 #![reexport_test_harness_main = "test_main"]
 
-use core::{panic::PanicInfo, cell::RefCell};
-use kernel::drivers::framebuffer::Pixel;
+use core::panic::PanicInfo;
 
 bootloader_api::entry_point!(kernel_main);
 
 #[cfg(not(test))]
 fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
+    use core::cell::RefCell;
+    use gtmos_kernel::drivers::framebuffer::Pixel;
     if let Some(framebuffer) = boot_info.framebuffer.as_mut() {
         let width = {framebuffer.info().width};
         let height = {framebuffer.info().height};
-        let fb_mem = RefCell::new(kernel::drivers::framebuffer::FramebufferMemory {
+        let fb_mem = RefCell::new(gtmos_kernel::drivers::framebuffer::FramebufferMemory {
             width: width,
             height: height,
             bytes_per_pixel: framebuffer.info().bytes_per_pixel,
             buffer: framebuffer.buffer_mut(),
         });
-        let graphics_api: &mut kernel::graphics::GraphicsAPI = &mut kernel::graphics::GraphicsAPI::new(fb_mem);
+        let graphics_api: &mut gtmos_kernel::graphics::GraphicsAPI = &mut gtmos_kernel::graphics::GraphicsAPI::new(fb_mem);
 
-        // Fill the entire framebuffer with a white colour.
+        // Fill the entire framebuffer with a teal colour.
         graphics_api.draw_filled_rectangle(0, 0, width, height, Pixel {
             b: 0x80,
             g: 0x80,
@@ -87,16 +88,19 @@ fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
         );
     }
 
-    kernel::serial_println!("Welcome to GT-MOS!\nGT-MOS is (c) 2023 Samuel Hulme, All rights reserved.");
-    kernel::serial_println!("Hello World{}", "!");
-
-    #[cfg(test)]
-    test_main();
+    gtmos_kernel::serial_println!("Welcome to GT-MOS!\nGT-MOS is (c) 2023 Samuel Hulme, All rights reserved.");
+    gtmos_kernel::serial_println!("Hello World{}", "!");
 
     loop {
-        let c = kernel::drivers::serial::receive();
-        kernel::serial_print!("{}", c);
+        let c = gtmos_kernel::drivers::serial::receive();
+        gtmos_kernel::serial_print!("{}", c);
     }
+}
+
+#[cfg(test)]
+pub(crate) fn kernel_main(_boot_info: &'static mut bootloader_api::BootInfo) -> ! {
+    test_main();
+    loop {}
 }
 
 // This function is called on panic.
@@ -107,12 +111,12 @@ fn panic(info: &PanicInfo) -> ! {
     // use crate::drivers::vga_buffer::WRITER;
     // WRITER.lock().set_colour_code(Colour::White, Colour::Red);
     // print!("{}", info);
-    kernel::serial_println!("{}", info);
+    gtmos_kernel::serial_println!("{}", info);
     loop {}
 }
 
 #[cfg(test)]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    kernel::test_panic_handler(info);
+    gtmos_kernel::test_panic_handler(info);
 }

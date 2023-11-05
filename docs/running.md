@@ -18,6 +18,9 @@ A release build will have `debug` replaced with `release`.
 
 Additionally, you may use `cargo run --bin qemu-bios` to run the image.
 
+> [!NOTE]  
+> If you don't see the image files in their path you may need to run `cargo run  --bin gtmos_tools`. This will run `cargo build` automatically.
+
 ### UEFI
 
 You may run the image with `qemu-system-x86_64 -drive format=raw,file=target/debug/uefi.img -bios OVMF-pure-efi.fd`.
@@ -28,12 +31,17 @@ A release build will have `debug` replaced with `release`.
 
 Additionally, you may use `cargo run --bin qemu-uefi` to run the image. This will have `OVMF-pure-efi.fd` included!
 
+> [!NOTE]  
+> If you don't see the image files in their path you may need to run `cargo run  --bin gtmos_tools`. This will run `cargo build` automatically.
+
 ### Cargo run
 
 You may use `cargo run` to run the image. By default it will open QEMU just like [QEMU in BIOS](#bios)
 
 > [!NOTE]  
 > Bonus: `cargo run` will build the os to!
+>
+> If you don't see the image files in their path you may need to run `cargo run  --bin gtmos_tools`. This will run `cargo build` automatically.
 
 ## Cargo test
 
