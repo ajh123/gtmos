@@ -16,10 +16,8 @@ use kernel::drivers::framebuffer::Pixel;
 
 bootloader_api::entry_point!(kernel_main);
 
-// #[cfg(not(test))]
+#[cfg(not(test))]
 fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
-    use kernel::graphics;
-
     if let Some(framebuffer) = boot_info.framebuffer.as_mut() {
         let width = {framebuffer.info().width};
         let height = {framebuffer.info().height};
