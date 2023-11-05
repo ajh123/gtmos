@@ -12,13 +12,14 @@
 #![reexport_test_harness_main = "test_main"]
 
 use core::{panic::PanicInfo, cell::RefCell};
-
 use kernel::drivers::framebuffer::Pixel;
 
 bootloader_api::entry_point!(kernel_main);
 
-#[cfg(not(test))]
+// #[cfg(not(test))]
 fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
+    use kernel::graphics;
+
     if let Some(framebuffer) = boot_info.framebuffer.as_mut() {
         let width = {framebuffer.info().width};
         let height = {framebuffer.info().height};
@@ -32,9 +33,9 @@ fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
 
         // Fill the entire framebuffer with a white colour.
         graphics_api.draw_filled_rectangle(0, 0, width, height, Pixel {
-            b: 0xFF,
-            g: 0xFF,
-            r: 0xFF
+            b: 0x80,
+            g: 0x80,
+            r: 0x00
         });
 
         // Draw a line from (10, 10) to (100, 100) with a red colour.
@@ -50,6 +51,42 @@ fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
             g: 0x00,
             r: 0x00
         });
+
+        graphics_api.draw_char_transparent(
+            0,
+            0,
+            'A',
+            Pixel {
+                b: 0xFF,
+                g: 0xFF,
+                r: 0xFF
+            },
+            1
+        );
+
+        graphics_api.draw_char_transparent(
+            0,
+            0,
+            'A',
+            Pixel {
+                b: 0xFF,
+                g: 0xFF,
+                r: 0xFF
+            },
+            25
+        );
+
+        graphics_api.draw_char_transparent(
+            80,
+            80,
+            'A',
+            Pixel {
+                b: 0xFF,
+                g: 0xFF,
+                r: 0xFF
+            },
+            50
+        );
     }
 
     kernel::serial_println!("Welcome to GT-MOS!\nGT-MOS is (c) 2023 Samuel Hulme, All rights reserved.");

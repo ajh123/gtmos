@@ -56,7 +56,7 @@ impl Framebuffer {
     }
 
     #[inline]
-    pub fn get_pixel(fb: FramebufferMemory, index: FramebufferIndex) -> Option<Pixel> {
+    pub fn get_pixel(fb: &mut FramebufferMemory, index: FramebufferIndex) -> Option<Pixel> {
         if let Some(offset) = Framebuffer::index_to_offset(&fb, index) {
             return Some(Pixel {
                 b: fb.buffer[offset],
