@@ -34,24 +34,21 @@ fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
         graphics_api.draw_filled_rectangle(0, 0, width, height, Pixel {
             b: 0xFF,
             g: 0xFF,
-            r: 0xFF,
-            channel: 0xFF,
+            r: 0xFF
         });
 
         // Draw a line from (10, 10) to (100, 100) with a red colour.
         graphics_api.draw_line(10, 10, 100, 100, Pixel {
             b: 0x00,
             g: 0x00,
-            r: 0xFF,
-            channel: 0xFF,
+            r: 0xFF
         });
 
         // Draw a filled rectangle at (50, 50) with a blue colour.
         graphics_api.draw_filled_rectangle(5, 5, 30, 30, Pixel {
             b: 0xFF,
             g: 0x00,
-            r: 0x00,
-            channel: 0xFF,
+            r: 0x00
         });
     }
 

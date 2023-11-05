@@ -7,9 +7,7 @@ pub struct Pixel {
     /// green channel
     pub g: u8,
     /// red channel
-    pub r: u8,
-    /// this byte is 0 in BGR mode, in BGRA, it is alpha.
-    pub channel: u8,
+    pub r: u8
 }
 
 /// Represents a framebuffer memory region and other metadata used to control
@@ -34,7 +32,7 @@ pub struct Framebuffer;
 impl Framebuffer {
     #[inline]
     pub fn index_in_bounds(fb: &FramebufferMemory, index: &FramebufferIndex) -> bool {
-        return ((index.y * fb.width + index.x) * fb.bytes_per_pixel)+3 <= fb.buffer.len() -1;
+        return index.x < fb.width && index.y < fb.height;
     }
 
     #[inline]
@@ -49,10 +47,11 @@ impl Framebuffer {
     #[inline]
     pub fn set_pixel(fb: &mut FramebufferMemory, pixel: Pixel, index: FramebufferIndex) {
         if let Some(offset) = Framebuffer::index_to_offset(&fb, index) {
-            fb.buffer[offset] = pixel.b;
-            fb.buffer[offset + 1] = pixel.g;
-            fb.buffer[offset + 2] = pixel.r;
-            fb.buffer[offset + 3] = pixel.channel;
+            if offset+2 < fb.buffer.len() {
+                fb.buffer[offset] = pixel.b;
+                fb.buffer[offset + 1] = pixel.g;
+                fb.buffer[offset + 2] = pixel.r;
+            }
         }
     }
 
@@ -62,8 +61,7 @@ impl Framebuffer {
             return Some(Pixel {
                 b: fb.buffer[offset],
                 g: fb.buffer[offset + 1],
-                r: fb.buffer[offset + 2],
-                channel: fb.buffer[offset + 4],
+                r: fb.buffer[offset + 2]
             });
         }
 
@@ -85,7 +83,6 @@ impl Framebuffer {
             fb_region_slice[offset] = pixel.b;
             fb_region_slice[offset + 1] = pixel.g;
             fb_region_slice[offset + 2] = pixel.r;
-            fb_region_slice[offset + 3] = pixel.channel;
             offset += bps;
         }
     }

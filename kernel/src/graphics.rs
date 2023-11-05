@@ -19,13 +19,6 @@ impl<'a> GraphicsAPI<'a> {
 
     /// Plot a pixel at the specified location (x, y) with the given colour.
     pub fn plot_pixel(&mut self, x: usize, y: usize, pixel: Pixel) {
-        // let fb = *self.framebuffer.get_mut();
-
-        // // let fb_ptr = self.framebuffer.as_ptr();
-        // // let fb = unsafe {&mut *fb_ptr };
-
-        // let index = FramebufferIndex { x, y };
-        // Framebuffer::set_pixel(fb, pixel, index); // fb needs to be `&mut FramebufferMemory<'_>`
         let mut fb = self.framebuffer.borrow_mut();
         let index = FramebufferIndex { x, y };
         Framebuffer::set_pixel(&mut fb, pixel, index);
