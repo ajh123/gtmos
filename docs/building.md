@@ -9,6 +9,12 @@ Then navigate back to this repository and run:
 For a release build run:
 `cargo build --release`
 
+> [!WARNING]
+> Note2: For some reason `cargo build` does not work correctly, however the cargo run from above does.
+
+> [!NOTE]
+> If you don't see the image files in their path you may need to run `cargo run  --bin gtmos_tools`. This will run `cargo build` automatically.
+
 If you get any errors please go to [Troubleshooting](#troubleshooting).
 
 For normal builds the resulting image files will be located at:
@@ -18,19 +24,16 @@ For normal builds the resulting image files will be located at:
 
 A release build will have `debug` replaced with `release`.
 
-> [!NOTE]  
-> If you don't see the image files in their path you may need to run `cargo run  --bin gtmos_tools`. This will run `cargo build` automatically.
-
 You now may [run the os](./running.md)!
 
-> [!NOTE]  
+> [!NOTE]
 > Bonus: `cargo run` will build the os to!
 
 ## Troubleshooting
 
 ### Error: Kernel build failed
 
-> [!NOTE]  
+> [!NOTE]
 > This may not be relevant to the UEFI rewrite of GT-MOS.
 
 If you get an error like:
@@ -48,7 +51,7 @@ Then run `cargo bootimage` again.
 
 ### Error: Bootloader build failed
 
-> [!NOTE]  
+> [!NOTE]
 > This may not be relevant to the UEFI rewrite of GT-MOS.
 
 If you get an error like:
