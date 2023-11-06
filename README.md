@@ -8,6 +8,11 @@ A simple rust operating system that does not do much yet.
 
 See [docs/building.md](docs/running.md) and [docs/building.md](docs/running.md)
 
+## Contributing
+
+We are looking for contributors. Any one is welcome! By contributing code you agree that you are allowed to do so and you agree that the code you made will be published with the same license as GT-MOS.
+You may see our [roadmap](docs/roadmap.md) to see what we want.
+
 ## License
 
 Copyright (C) 2023  Samuel Hulme
