@@ -10,7 +10,7 @@ For a release build run:
 `cargo build --release`
 
 > [!WARNING]
-> Note2: For some reason `cargo build` does not work correctly, however the cargo run from above does.
+> For some reason `cargo build` does not work correctly, however `cargo run` does.
 
 > [!NOTE]
 > If you don't see the image files in their path you may need to run `cargo run  --bin gtmos_tools`. This will run `cargo build` automatically.
