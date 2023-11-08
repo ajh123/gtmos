@@ -41,19 +41,16 @@ body:
         - **GT-MOS**: v0.1.0
         - **rustc**: rustc 1.75.0-nightly (608e9682f 2023-10-29)
         - **cargo**: cargo 1.75.0-nightly (708383d62 2023-10-27)
+        - **Build environment:** Windows 10 Home,
+      Version: 22H2, Build 19045.3570
     value: |
         - GT-MOS:
         - rustc:
         - cargo:
+        - Build environment:
     render: markdown
   validations:
     required: true
-- type: textarea
-  attributes:
-    label: Build Environment
-    description: |
-      Anything about your build environment that might help us. Example: "I'm using Windows 10 Home,
-      Version: 22H2, Build 19045.3570"
 - type: textarea
   attributes:
     label: Anything else?
