@@ -11,4 +11,5 @@ To compile GT-MOS you may see [building.md](running.md) and [building.md](runnin
 ## Design
 
 - [Kernel](./design/kernel/index.md)
-  - [Device Management](./design/kernel/device-manager/index.md)
+  - [Platform Abstraction](./design/kernel/platform-abstraction/index.md)
+    - [Device Management](./design/kernel/platform-abstraction/device-manager/index.md)

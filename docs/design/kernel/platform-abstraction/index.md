@@ -7,6 +7,8 @@ The kernel shall be divided into multiple crates / modules:
 
 These crates / modules will allow support for multiple CPU architectures in the future.
 
+If you can open draw.io files then you may download [./diagram.drawio](./diagram.drawio) for more implementation details.
+
 ## Main "core" crate
 
 This will contain APIs and abstractions for everything the kernel should have, for example the
