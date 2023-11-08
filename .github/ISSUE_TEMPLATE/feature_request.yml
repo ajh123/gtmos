@@ -24,10 +24,10 @@ body:
     required: true
 - type: textarea
   attributes:
-    label: Alternatives
+    label: Alternatives?
     description: A clear and concise description of any alternative solutions or features you've considered.
   validations:
-    required: true
+    required: false
 - type: textarea
   attributes:
     label: Anything else?
