@@ -2,11 +2,11 @@
 
 A simple rust operating system that does not do much yet.
 
-![An image of the operating system running in QEMU showing a teal background and 3 A letters at different text sizes. There is also a blue box and a red diagonal line in the top left corner](docs/images/Screenshot%202023-11-06%20190146.png)
+![An image of the operating system running in QEMU showing a teal background and 3 A letters at different text sizes. There is also a blue box and a red diagonal line in the top left corner](./docs/images/Screenshot%202023-11-06%20190146.png)
 
 ## Using
 
-See [docs/building.md](docs/running.md) and [docs/building.md](docs/running.md)
+See the [documentation](./docs/index.md) or the [docs/building.md](./docs/running.md) and [docs/building.md](./docs/running.md) guides.
 
 ## Contributing
 
