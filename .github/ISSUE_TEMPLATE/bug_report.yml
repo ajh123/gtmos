@@ -1,7 +1,7 @@
 name: 🐞 Bug
 description: File a bug/issue
 title: "[BUG] <title>"
-labels: ["Bug", "Not Confirmed"]
+labels: ["bug", "not confirmed"]
 body:
 - type: checkboxes
   attributes:

@@ -1,7 +1,7 @@
 name: Feature request
 description: Suggest an idea for this project
 title: "[RFC] <title>"
-labels: ["Enhancement", "Not Confirmed"]
+labels: ["enhancement", "not confirmed"]
 body:
 - type: checkboxes
   attributes:
