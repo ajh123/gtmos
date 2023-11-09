@@ -10,8 +10,13 @@
 #![test_runner(gtmos_kernel::test_runner)]
 // replace the generated test main with our own
 #![reexport_test_harness_main = "test_main"]
+#![feature(abi_x86_interrupt)]
 
 use gtmos_kernel;
+
+pub mod interrupts;
+pub mod cpu;
+pub mod gdt;
 
 bootloader_api::entry_point!(kernel_main);
 
@@ -19,6 +24,9 @@ bootloader_api::entry_point!(kernel_main);
 fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
     use core::cell::RefCell;
     use gtmos_kernel::drivers::framebuffer::Pixel;
+
+    cpu::initialise();
+
     if let Some(framebuffer) = boot_info.framebuffer.as_mut() {
         let width = {framebuffer.info().width};
         let height = {framebuffer.info().height};
@@ -92,13 +100,14 @@ fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
     gtmos_kernel::serial_println!("Hello World{}", "!");
 
     loop {
-        let c = gtmos_kernel::drivers::serial::receive();
-        gtmos_kernel::serial_print!("{}", c);
+        // let c = gtmos_kernel::drivers::serial::receive();
+        // gtmos_kernel::serial_print!("{}", c);
     }
 }
 
 #[cfg(test)]
 pub(crate) fn kernel_main(_boot_info: &'static mut bootloader_api::BootInfo) -> ! {
+    cpu::initialise();
     test_main();
     loop {}
 }
