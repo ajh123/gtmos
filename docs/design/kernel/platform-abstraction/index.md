@@ -2,8 +2,8 @@
 
 The kernel shall be divided into multiple crates / modules:
 
-- Main "core" located at [../../kernel/](../../kernel/).
-- x86_64 support located at [../../kernel/x86_64/](../../kernel/x86_64/).
+- Main "core" located at [../../gtmos_kernel/](../../gtmos_kernel/).
+- x86_64 support located at [../../gtmos_kernel_x86_64/](../../gtmos_kernel_x86_64/).
 
 These crates / modules will allow support for multiple CPU architectures in the future.
 

@@ -472,11 +472,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "gtmos_kernel_x86_64"
+version = "0.1.0"
+dependencies = [
+ "bootloader_api",
+ "font8x8",
+ "gtmos_kernel",
+ "lazy_static",
+ "spin 0.9.8",
+ "uart_16550",
+]
+
+[[package]]
 name = "gtmos_tools"
 version = "0.1.0"
 dependencies = [
  "bootloader",
- "gtmos_kernel",
+ "gtmos_kernel_x86_64",
  "ovmf-prebuilt",
 ]
 

@@ -85,3 +85,15 @@ pub fn exit_qemu(exit_code: QemuExitCode) {
     //     port.write(exit_code as u32);
     // }
 }
+
+// This function is called on panic.
+#[cfg(not(test))]
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    // use crate::drivers::vga_buffer::Colour;
+    // use crate::drivers::vga_buffer::WRITER;
+    // WRITER.lock().set_colour_code(Colour::White, Colour::Red);
+    // print!("{}", info);
+    crate::serial_println!("{}", info);
+    loop {}
+}

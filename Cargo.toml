@@ -1,6 +1,7 @@
 [workspace]
-resolver = "1"
+resolver = "2"
 members = [
-    "kernel",
+    "gtmos_kernel",
+    "gtmos_kernel_x86_64",
     "tools"
 ]

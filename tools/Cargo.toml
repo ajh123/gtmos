@@ -8,5 +8,5 @@ default-run = "qemu-bios"
 ovmf-prebuilt = "0.1.0-alpha.0"
 
 [build-dependencies]
-gtmos_kernel = { path = "../kernel", artifact = "bin", target = "x86_64-unknown-none" }
+gtmos_kernel_x86_64 = { path = "../gtmos_kernel_x86_64", artifact = "bin", target = "x86_64-unknown-none" }
 bootloader = "0.11.4"

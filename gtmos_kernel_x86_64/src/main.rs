@@ -12,6 +12,7 @@
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
+use gtmos_kernel;
 
 bootloader_api::entry_point!(kernel_main);
 
@@ -101,22 +102,4 @@ fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
 pub(crate) fn kernel_main(_boot_info: &'static mut bootloader_api::BootInfo) -> ! {
     test_main();
     loop {}
-}
-
-// This function is called on panic.
-#[cfg(not(test))]
-#[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
-    // use crate::drivers::vga_buffer::Colour;
-    // use crate::drivers::vga_buffer::WRITER;
-    // WRITER.lock().set_colour_code(Colour::White, Colour::Red);
-    // print!("{}", info);
-    gtmos_kernel::serial_println!("{}", info);
-    loop {}
-}
-
-#[cfg(test)]
-#[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
-    gtmos_kernel::test_panic_handler(info);
 }
