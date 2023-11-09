@@ -11,7 +11,6 @@
 // replace the generated test main with our own
 #![reexport_test_harness_main = "test_main"]
 
-use core::panic::PanicInfo;
 use gtmos_kernel;
 
 bootloader_api::entry_point!(kernel_main);
