@@ -48,7 +48,7 @@ You may use `cargo run` to run the image. By default it will open QEMU just like
 You may use `cargo test` to run the image like in [`cargo run`](#cargo-run) but it will run tests instead.
 
 > [!WARNING]
-> Testing system is not implemented!
+> Testing system is not implemented! See https://github.com/ajh123/gtmos/issues/6 for more details.
 
 ## Real machine
 
