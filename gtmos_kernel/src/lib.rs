@@ -37,7 +37,6 @@ where
 
 #[doc(hidden)]
 pub fn test_runner(tests: &[&dyn Testable]) {
-    serial_println!("dsfuidhdfshidfhidfuidfh");
     serial_println!("Running {} tests", tests.len());
     for test in tests {
         test.run();
@@ -57,7 +56,8 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
 #[cfg(test)]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    test_panic_handler(info)
+    test_panic_handler(info);
+    loop {}
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -78,14 +78,3 @@ pub fn exit_qemu(_exit_code: QemuExitCode) {
     // }
 }
 
-// This function is called on panic.
-#[cfg(not(test))]
-#[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
-    // use crate::drivers::vga_buffer::Colour;
-    // use crate::drivers::vga_buffer::WRITER;
-    // WRITER.lock().set_colour_code(Colour::White, Colour::Red);
-    // print!("{}", info);
-    crate::serial_println!("{}", info);
-    loop {}
-}

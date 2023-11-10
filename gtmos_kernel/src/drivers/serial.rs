@@ -1,10 +1,20 @@
-use crate::platform::get_platform;
+use core::fmt;
+
+use crate::platform::get_cpu;
 
 #[doc(hidden)]
 pub fn _print(args: ::core::fmt::Arguments) {
-    if let Some(platform) = get_platform() {
-        let message = args.as_str().unwrap_or_default();
-        platform.write("serial", message);
+    use core::fmt::Write;
+    let mut w = Writer {};
+    let _ = w.write_fmt(args);
+}
+struct Writer {}
+impl fmt::Write for Writer {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        if let Some(cpu) = get_cpu() {
+            cpu.write("serial", s);
+        }
+        Ok(())
     }
 }
 

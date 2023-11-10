@@ -12,8 +12,9 @@
 #![reexport_test_harness_main = "test_main"]
 #![feature(abi_x86_interrupt)]
 
+use core::panic::PanicInfo;
 use gtmos_kernel;
-use gtmos_kernel::platform::{Platform, set_platform, get_platform};
+use gtmos_kernel::platform::{Platform, set_platform, get_cpu};
 use cpu::X86_64Cpu;
 
 pub mod interrupts;
@@ -27,13 +28,10 @@ fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
     use core::cell::RefCell;
     use gtmos_kernel::drivers::framebuffer::Pixel;
 
-    let my_cpu = X86_64Cpu;
-    let platform = Platform::new(my_cpu);
+    let platform = Platform::new(X86_64Cpu);
     set_platform(platform);
 
-    if let Some(platform) = get_platform() {
-        platform.initialise();
-
+    if let Some(my_cpu) = get_cpu() {
         if let Some(framebuffer) = boot_info.framebuffer.as_mut() {
             let width = {framebuffer.info().width};
             let height = {framebuffer.info().height};
@@ -106,20 +104,39 @@ fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
         gtmos_kernel::serial_println!("Welcome to GT-MOS!\nGT-MOS is (c) 2023 Samuel Hulme, All rights reserved.");
         gtmos_kernel::serial_println!("Hello World{}", "!");
 
-        platform.halt();
+        my_cpu.halt();
     }
-    loop {}
+    loop {
+        x86_64::instructions::hlt();
+    }
 }
 
 #[cfg(test)]
 pub(crate) fn kernel_main(_boot_info: &'static mut bootloader_api::BootInfo) -> ! {
-    let my_cpu = X86_64Cpu;
-    let platform = Platform::new(my_cpu);
+    let platform = Platform::new(X86_64Cpu);
     set_platform(platform);
-    if let Some(platform) = get_platform() {
-        platform.initialise();
+    if let Some(my_cpu) = get_cpu() {
         test_main();
-        platform.halt();
+        my_cpu.halt();
     }
-    loop {}
+    loop {
+        x86_64::instructions::hlt();
+    }
+}
+
+
+// This function is called on panic.
+#[cfg(not(test))]
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    // use crate::drivers::vga_buffer::Colour;
+    // use crate::drivers::vga_buffer::WRITER;
+    // WRITER.lock().set_colour_code(Colour::White, Colour::Red);
+    // print!("{}", info);
+    x86_64::instructions::interrupts::disable();
+    gtmos_kernel::serial_println!("{}", info);
+    loop {
+        x86_64::instructions::interrupts::disable();
+        x86_64::instructions::hlt();
+    }
 }

@@ -36,13 +36,14 @@ pub fn set_platform<T: CPU>(platform: Platform<T>) {
             let static_ref: &'static dyn CPU =
                 mem::transmute(&platform.cpu as &dyn CPU);
             PLATFORM = Some(RefCell::new(Some(static_ref)));
+            platform.initialise();
         }
     }
 }
 
 
-// Function to get a reference to the platform
-pub fn get_platform() -> Option<&'static dyn CPU> {
+// Function to get a reference to the platform's cpu
+pub fn get_cpu() -> Option<&'static dyn CPU> {
     unsafe {
         PLATFORM
             .as_ref()
