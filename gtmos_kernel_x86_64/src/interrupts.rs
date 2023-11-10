@@ -1,11 +1,11 @@
 use lazy_static::lazy_static;
 use pic8259::ChainedPics;
 use spin;
-use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
+use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame, PageFaultErrorCode};
 
 use crate::gdt;
 
-pub const PIC_1_OFFSET: u8 = 32;
+pub const PIC_1_OFFSET: u8 = 64;
 pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
 
 #[derive(Debug, Clone, Copy)]
@@ -48,6 +48,15 @@ lazy_static! {
         idt.segment_not_present.set_handler_fn(segment_not_present_handler);
         idt.stack_segment_fault.set_handler_fn(stack_segment_fault_handler);
         idt.general_protection_fault.set_handler_fn(general_protection_fault_handler);
+        idt.page_fault.set_handler_fn(page_fault_handler);
+        idt.x87_floating_point.set_handler_fn(x87_floating_point_exception_handler);
+        idt.alignment_check.set_handler_fn(alignment_check_handler);
+        idt.machine_check.set_handler_fn(machine_check_handler);
+        idt.simd_floating_point.set_handler_fn(simd_floating_point_exception_handler);
+        idt.virtualization.set_handler_fn(virtualisation_exception_handler);
+        idt.hv_injection_exception.set_handler_fn(hypervisor_injection_exception_handler);
+        idt.vmm_communication_exception.set_handler_fn(vmm_communication_exception_handler);
+        idt.security_exception.set_handler_fn(security_exception_handler);
         idt[InterruptIndex::Timer.as_usize()].set_handler_fn(timer_interrupt_handler);
         // idt[InterruptIndex::Keyboard.as_usize()].set_handler_fn(keyboard_interrupt_handler);
         idt
@@ -130,45 +139,46 @@ extern "x86-interrupt" fn general_protection_fault_handler(stack_frame: Interrup
     gtmos_kernel::serial_println!("EXCEPTION: GENERAL_PROTECTION_FAULT\n{:#?}", stack_frame);
 }
 
-extern "x86-interrupt" fn page_fault_handler(stack_frame: InterruptStackFrame, _error_code: u64) -> !{
+extern "x86-interrupt" fn page_fault_handler(stack_frame: InterruptStackFrame, _error_code: PageFaultErrorCode) {
     gtmos_kernel::serial_println!("EXCEPTION: PAGE FAULT\n{:#?}", stack_frame);
 }
 
-extern "x86-interrupt" fn x87_floating_point_exception_handler(stack_frame: InterruptStackFrame, _error_code: u64) -> !{
+extern "x86-interrupt" fn x87_floating_point_exception_handler(stack_frame: InterruptStackFrame) {
     gtmos_kernel::serial_println!("EXCEPTION: X87 FLOATING POINT EXCEPTION\n{:#?}", stack_frame);
 }
 
-extern "x86-interrupt" fn alignment_check_handler(stack_frame: InterruptStackFrame, _error_code: u64) -> !{
+extern "x86-interrupt" fn alignment_check_handler(stack_frame: InterruptStackFrame, _error_code: u64) {
     gtmos_kernel::serial_println!("EXCEPTION: ALIGNMENT CHECK\n{:#?}", stack_frame);
 }
 
-extern "x86-interrupt" fn machine_check_handler(stack_frame: InterruptStackFrame, _error_code: u64) -> !{
-    gtmos_kernel::serial_println!("EXCEPTION: MACHINE CHECK\n{:#?}", stack_frame);
+extern "x86-interrupt" fn machine_check_handler(stack_frame: InterruptStackFrame) -> ! {
+    panic!("EXCEPTION: MACHINE CHECK\n{:#?}", stack_frame);
 }
 
-extern "x86-interrupt" fn simd_floating_point_exception_handler(stack_frame: InterruptStackFrame, _error_code: u64) -> !{
+extern "x86-interrupt" fn simd_floating_point_exception_handler(stack_frame: InterruptStackFrame) {
     gtmos_kernel::serial_println!("EXCEPTION: SIMD FLOATING POINT EXCEPTION\n{:#?}", stack_frame);
 }
 
-extern "x86-interrupt" fn virtualisation_exception_handler(stack_frame: InterruptStackFrame, _error_code: u64) -> !{
+extern "x86-interrupt" fn virtualisation_exception_handler(stack_frame: InterruptStackFrame) {
     gtmos_kernel::serial_println!("EXCEPTION: VIRTUALISATION EXCEPTION\n{:#?}", stack_frame);
 }
 
-extern "x86-interrupt" fn hypervisor_injection_exception_handler(stack_frame: InterruptStackFrame, _error_code: u64) -> !{
+extern "x86-interrupt" fn hypervisor_injection_exception_handler(stack_frame: InterruptStackFrame) {
     gtmos_kernel::serial_println!("EXCEPTION: HYPERVISOR INJECTION EXCEPTION\n{:#?}", stack_frame);
 }
 
-extern "x86-interrupt" fn vmm_communication_exception_handler(stack_frame: InterruptStackFrame, _error_code: u64) -> !{
+extern "x86-interrupt" fn vmm_communication_exception_handler(stack_frame: InterruptStackFrame, _error_code: u64) {
     gtmos_kernel::serial_println!("EXCEPTION: VMM COMMUNICATION EXCEPTION\n{:#?}", stack_frame);
 }
 
-extern "x86-interrupt" fn security_exception_handler(stack_frame: InterruptStackFrame, _error_code: u64) -> !{
+extern "x86-interrupt" fn security_exception_handler(stack_frame: InterruptStackFrame, _error_code: u64) {
     gtmos_kernel::serial_println!("EXCEPTION: SECURITY EXCEPTION\n{:#?}", stack_frame);
 }
 
 /// Handles an interrupt from the Intel 8253 timer.
 extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: InterruptStackFrame){
     gtmos_kernel::serial_print!("AAAAAAAAAAAA");
+    panic!("sddsdssddsds");
 }
 
 #[test_case]

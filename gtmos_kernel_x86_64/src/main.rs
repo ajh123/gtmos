@@ -95,6 +95,7 @@ fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
             50
         );
     }
+    x86_64::instructions::interrupts::enable();
 
     gtmos_kernel::serial_println!("Welcome to GT-MOS!\nGT-MOS is (c) 2023 Samuel Hulme, All rights reserved.");
     gtmos_kernel::serial_println!("Hello World{}", "!");
