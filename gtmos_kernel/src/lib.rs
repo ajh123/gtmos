@@ -14,6 +14,7 @@
 
 pub mod drivers;
 pub mod graphics;
+pub mod platform;
 
 use core::panic::PanicInfo;
 
@@ -77,12 +78,12 @@ pub enum QemuExitCode {
 }
 
 #[doc(hidden)]
-pub fn exit_qemu(exit_code: QemuExitCode) {
+pub fn exit_qemu(_exit_code: QemuExitCode) {
     // use x86_64::instructions::port::Port;
 
     // unsafe {
     //     let mut port = Port::new(0xf4);
-    //     port.write(exit_code as u32);
+    //     port.write(_exit_code as u32);
     // }
 }
 

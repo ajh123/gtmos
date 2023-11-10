@@ -13,7 +13,8 @@
 #![feature(abi_x86_interrupt)]
 
 use gtmos_kernel;
-use gtmos_kernel_x86_64::hlt_loop;
+use gtmos_kernel::platform::{Platform, set_platform, get_platform};
+use cpu::X86_64Cpu;
 
 pub mod interrupts;
 pub mod cpu;
@@ -26,86 +27,99 @@ fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
     use core::cell::RefCell;
     use gtmos_kernel::drivers::framebuffer::Pixel;
 
-    cpu::initialise();
+    let my_cpu = X86_64Cpu;
+    let platform = Platform::new(my_cpu);
+    set_platform(platform);
 
-    if let Some(framebuffer) = boot_info.framebuffer.as_mut() {
-        let width = {framebuffer.info().width};
-        let height = {framebuffer.info().height};
-        let fb_mem = RefCell::new(gtmos_kernel::drivers::framebuffer::FramebufferMemory {
-            width: width,
-            height: height,
-            bytes_per_pixel: framebuffer.info().bytes_per_pixel,
-            buffer: framebuffer.buffer_mut(),
-        });
-        let graphics_api: &mut gtmos_kernel::graphics::GraphicsAPI = &mut gtmos_kernel::graphics::GraphicsAPI::new(fb_mem);
+    if let Some(platform) = get_platform() {
+        platform.initialise();
 
-        // Fill the entire framebuffer with a teal colour.
-        graphics_api.draw_filled_rectangle(0, 0, width, height, Pixel {
-            b: 0x80,
-            g: 0x80,
-            r: 0x00
-        });
+        if let Some(framebuffer) = boot_info.framebuffer.as_mut() {
+            let width = {framebuffer.info().width};
+            let height = {framebuffer.info().height};
+            let fb_mem = RefCell::new(gtmos_kernel::drivers::framebuffer::FramebufferMemory {
+                width: width,
+                height: height,
+                bytes_per_pixel: framebuffer.info().bytes_per_pixel,
+                buffer: framebuffer.buffer_mut(),
+            });
+            let graphics_api: &mut gtmos_kernel::graphics::GraphicsAPI = &mut gtmos_kernel::graphics::GraphicsAPI::new(fb_mem);
 
-        // Draw a line from (10, 10) to (100, 100) with a red colour.
-        graphics_api.draw_line(10, 10, 100, 100, Pixel {
-            b: 0x00,
-            g: 0x00,
-            r: 0xFF
-        });
+            // Fill the entire framebuffer with a teal colour.
+            graphics_api.draw_filled_rectangle(0, 0, width, height, Pixel {
+                b: 0x80,
+                g: 0x80,
+                r: 0x00
+            });
 
-        // Draw a filled rectangle at (50, 50) with a blue colour.
-        graphics_api.draw_filled_rectangle(5, 5, 30, 30, Pixel {
-            b: 0xFF,
-            g: 0x00,
-            r: 0x00
-        });
-
-        graphics_api.draw_char_transparent(
-            0,
-            0,
-            'A',
-            Pixel {
-                b: 0xFF,
-                g: 0xFF,
+            // Draw a line from (10, 10) to (100, 100) with a red colour.
+            graphics_api.draw_line(10, 10, 100, 100, Pixel {
+                b: 0x00,
+                g: 0x00,
                 r: 0xFF
-            },
-            1
-        );
+            });
 
-        graphics_api.draw_char_transparent(
-            0,
-            0,
-            'A',
-            Pixel {
+            // Draw a filled rectangle at (50, 50) with a blue colour.
+            graphics_api.draw_filled_rectangle(5, 5, 30, 30, Pixel {
                 b: 0xFF,
-                g: 0xFF,
-                r: 0xFF
-            },
-            25
-        );
+                g: 0x00,
+                r: 0x00
+            });
 
-        graphics_api.draw_char_transparent(
-            80,
-            80,
-            'A',
-            Pixel {
-                b: 0xFF,
-                g: 0xFF,
-                r: 0xFF
-            },
-            50
-        );
+            graphics_api.draw_char_transparent(
+                0,
+                0,
+                'A',
+                Pixel {
+                    b: 0xFF,
+                    g: 0xFF,
+                    r: 0xFF
+                },
+                1
+            );
+
+            graphics_api.draw_char_transparent(
+                0,
+                0,
+                'A',
+                Pixel {
+                    b: 0xFF,
+                    g: 0xFF,
+                    r: 0xFF
+                },
+                25
+            );
+
+            graphics_api.draw_char_transparent(
+                80,
+                80,
+                'A',
+                Pixel {
+                    b: 0xFF,
+                    g: 0xFF,
+                    r: 0xFF
+                },
+                50
+            );
+        }
+
+        gtmos_kernel::serial_println!("Welcome to GT-MOS!\nGT-MOS is (c) 2023 Samuel Hulme, All rights reserved.");
+        gtmos_kernel::serial_println!("Hello World{}", "!");
+
+        platform.halt();
     }
-
-    gtmos_kernel::serial_println!("Welcome to GT-MOS!\nGT-MOS is (c) 2023 Samuel Hulme, All rights reserved.");
-    gtmos_kernel::serial_println!("Hello World{}", "!");
-
-    hlt_loop();
+    loop {}
 }
 
 #[cfg(test)]
 pub(crate) fn kernel_main(_boot_info: &'static mut bootloader_api::BootInfo) -> ! {
-    cpu::initialise();
-    test_main();
-    hlt_loop();
+    let my_cpu = X86_64Cpu;
+    let platform = Platform::new(my_cpu);
+    set_platform(platform);
+    if let Some(platform) = get_platform() {
+        platform.initialise();
+        test_main();
+        platform.halt();
+    }
+    loop {}
 }
