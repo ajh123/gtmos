@@ -464,11 +464,9 @@ dependencies = [
 name = "gtmos_kernel"
 version = "0.1.0"
 dependencies = [
- "bootloader_api",
  "font8x8",
  "lazy_static",
  "spin 0.9.8",
- "uart_16550",
 ]
 
 [[package]]

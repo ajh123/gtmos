@@ -55,15 +55,6 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
 
 
 #[cfg(test)]
-bootloader_api::entry_point!(kernel_main);
-/// Entry point for `cargo test`
-#[cfg(test)]
-pub(crate) fn kernel_main(_boot_info: &'static mut bootloader_api::BootInfo) -> ! {
-    test_main();
-    loop {}
-}
-
-#[cfg(test)]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     test_panic_handler(info)
