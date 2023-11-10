@@ -13,6 +13,7 @@
 #![feature(abi_x86_interrupt)]
 
 use gtmos_kernel;
+use gtmos_kernel_x86_64::hlt_loop;
 
 pub mod interrupts;
 pub mod cpu;
@@ -95,20 +96,16 @@ fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
             50
         );
     }
-    x86_64::instructions::interrupts::enable();
 
     gtmos_kernel::serial_println!("Welcome to GT-MOS!\nGT-MOS is (c) 2023 Samuel Hulme, All rights reserved.");
     gtmos_kernel::serial_println!("Hello World{}", "!");
 
-    loop {
-        // let c = gtmos_kernel::drivers::serial::receive();
-        // gtmos_kernel::serial_print!("{}", c);
-    }
+    hlt_loop();
 }
 
 #[cfg(test)]
 pub(crate) fn kernel_main(_boot_info: &'static mut bootloader_api::BootInfo) -> ! {
     cpu::initialise();
     test_main();
-    loop {}
+    hlt_loop();
 }

@@ -15,3 +15,9 @@
 pub mod interrupts;
 pub mod cpu;
 pub mod gdt;
+
+pub fn hlt_loop() -> ! {
+    loop {
+        x86_64::instructions::hlt();
+    }
+}

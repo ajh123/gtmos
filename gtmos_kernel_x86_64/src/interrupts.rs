@@ -5,7 +5,7 @@ use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame, Pag
 
 use crate::gdt;
 
-pub const PIC_1_OFFSET: u8 = 64;
+pub const PIC_1_OFFSET: u8 = 32;
 pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
 
 #[derive(Debug, Clone, Copy)]
@@ -136,7 +136,7 @@ extern "x86-interrupt" fn stack_segment_fault_handler(stack_frame: InterruptStac
 }
 
 extern "x86-interrupt" fn general_protection_fault_handler(stack_frame: InterruptStackFrame, _error_code: u64) {
-    gtmos_kernel::serial_println!("EXCEPTION: GENERAL_PROTECTION_FAULT\n{:#?}", stack_frame);
+    gtmos_kernel::serial_println!("EXCEPTION: GENERAL PROTECTION FAULT\n{:#?}", stack_frame);
 }
 
 extern "x86-interrupt" fn page_fault_handler(stack_frame: InterruptStackFrame, _error_code: PageFaultErrorCode) {
@@ -177,8 +177,11 @@ extern "x86-interrupt" fn security_exception_handler(stack_frame: InterruptStack
 
 /// Handles an interrupt from the Intel 8253 timer.
 extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: InterruptStackFrame){
-    gtmos_kernel::serial_print!("AAAAAAAAAAAA");
-    panic!("sddsdssddsds");
+    gtmos_kernel::serial_print!(".");
+    unsafe {
+        PICS.lock()
+            .notify_end_of_interrupt(InterruptIndex::Timer.as_u8());
+    }
 }
 
 #[test_case]
