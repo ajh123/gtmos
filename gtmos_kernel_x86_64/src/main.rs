@@ -14,6 +14,7 @@
 
 use core::panic::PanicInfo;
 use gtmos_kernel;
+use gtmos_kernel::graphics::GraphicsAPI;
 use gtmos_kernel::platform::{Platform, set_platform, get_cpu};
 use cpu::X86_64Cpu;
 
@@ -21,12 +22,14 @@ pub mod interrupts;
 pub mod cpu;
 pub mod gdt;
 
+static mut GRAPHICS_API: Option<GraphicsAPI> = None;
+
 bootloader_api::entry_point!(kernel_main);
 
 #[cfg(not(test))]
 fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
     use core::cell::RefCell;
-    use gtmos_kernel::{drivers::framebuffer::Pixel, console::Console};
+    use gtmos_kernel::{drivers::framebuffer::Pixel, console::Console, platform::get_platform};
 
     let platform = Platform::new(X86_64Cpu);
     set_platform(platform);
@@ -41,22 +44,46 @@ fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
                 bytes_per_pixel: framebuffer.info().bytes_per_pixel,
                 buffer: framebuffer.buffer_mut(),
             });
-            let mut graphics_api: &mut gtmos_kernel::graphics::GraphicsAPI = &mut gtmos_kernel::graphics::GraphicsAPI::new(fb_mem);
+            // Create graphics_api instance inside the block
+            unsafe {
+                GRAPHICS_API = Some(GraphicsAPI::new(fb_mem));
+            }
+
             // Fill the entire framebuffer with a teal colour.
-            graphics_api.draw_filled_rectangle(0, 0, width, height, Pixel {
-                b: 0x80,
-                g: 0x80,
-                r: 0x00
-            });
+            unsafe {
+                if let Some(api) = GRAPHICS_API.as_mut() {
+                    api.draw_filled_rectangle(0, 0, width, height, Pixel {
+                        b: 0x80,
+                        g: 0x80,
+                        r: 0x00,
+                    });
+                }
+            }
 
-            let mut console = Console::new(&mut graphics_api, 2);
-
-            // Example usage of the console API
-            console.write_str("Hello, World!\n", Pixel { r: 0xFF, g: 0xFF, b: 0xFF }, Pixel { r: 0, g: 0x80, b: 0x80 });
+            // Set the console directly
+            // if let Some(platform) = get_platform::<X86_64Cpu>() {
+            //     unsafe {
+            //         platform.set_console(Console::new(GRAPHICS_API.as_mut().unwrap(), 2));
+            //     }
+            // }
         }
+        // if let Some(platform_from_get) = get_platform::<X86_64Cpu>() {
+        //     // platform_from_get.console = _console;
+        //     if let Some(console) = &mut platform_from_get.console {
+        //         let text_colour = Pixel { r: 0xFF, g: 0xFF, b: 0xFF };
+        //         let background_colour = Pixel { r: 0, g: 0x80, b: 0x80 };
 
+        //         console.write_str("A", text_colour, background_colour);
+        //         console.write_str("A\n", text_colour, background_colour);
+        //         console.write_str("Agj", text_colour, background_colour);
+        //     }
+        // }
+
+        // gtmos_kernel::println!("AAAgj");
         gtmos_kernel::serial_println!("Welcome to GT-MOS!\nGT-MOS is (c) 2023 Samuel Hulme, All rights reserved.");
+        // gtmos_kernel::println!("Welcome to GT-MOS!\nGT-MOS is (c) 2023 Samuel Hulme, All rights reserved.");
         gtmos_kernel::serial_println!("Hello World{}", "!");
+
 
         my_cpu.halt();
     }

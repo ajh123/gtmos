@@ -1,4 +1,5 @@
 use core::{cell::RefCell, mem};
+use crate::console::Console;
 
 pub trait CPU {
     fn initialise(&self);
@@ -9,11 +10,16 @@ pub trait CPU {
 
 pub struct Platform<T: CPU> {
     pub cpu: T,
+    pub console: Option<Console<'static>>,
 }
 
 impl<T: CPU> Platform<T> {
     pub fn new(cpu: T) -> Self {
-        Platform { cpu }
+        Platform { cpu, console: None }
+    }
+
+    pub fn set_console(&mut self, console: Console<'static>) {
+        self.console = Some(console);
     }
 
     pub fn initialise(&self) {
@@ -41,12 +47,24 @@ pub fn set_platform<T: CPU>(platform: Platform<T>) {
     }
 }
 
-
 // Function to get a reference to the platform's cpu
 pub fn get_cpu() -> Option<&'static dyn CPU> {
     unsafe {
         PLATFORM
             .as_ref()
             .and_then(|p| p.borrow().as_ref().cloned())
+    }
+}
+
+// Function to get a reference to the platform itself
+pub fn get_platform<T: CPU + 'static>() -> Option<&'static mut Platform<T>> {
+    unsafe {
+        PLATFORM
+            .as_ref()
+            .and_then(|p| {
+                let mut mut_ref = p.borrow_mut();
+                mut_ref.as_mut().map(|platform| platform as *mut _ as *mut Platform<T>)
+            })
+            .map(|platform_ptr| &mut *platform_ptr)
     }
 }

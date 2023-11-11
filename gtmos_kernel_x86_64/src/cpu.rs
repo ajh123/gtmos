@@ -1,4 +1,4 @@
-use gtmos_kernel::platform::CPU;
+use gtmos_kernel::{platform::{CPU, get_platform}, drivers::framebuffer::Pixel};
 use uart_16550::SerialPort;
 use spin::Mutex;
 use crate::{interrupts, gdt};
@@ -33,15 +33,26 @@ impl CPU for X86_64Cpu {
     }
 
     fn write(&self, dest: &str, data: &str) {
+        use x86_64::instructions::interrupts;
         if dest == "serial" {
             use core::fmt::Write;
-            use x86_64::instructions::interrupts;
 
             interrupts::without_interrupts(|| {
                 SERIAL1
                     .lock()
                     .write_str(data)
                     .expect("Printing to serial failed");
+            });
+        }
+        if dest == "vga_console" {
+            interrupts::without_interrupts(|| {
+                if let Some(platform_from_get) = get_platform::<X86_64Cpu>() {
+                    if let Some(console) = &mut platform_from_get.console {
+                        let text_colour = Pixel { r: 0xFF, g: 0xFF, b: 0xFF };
+                        let background_colour = Pixel { r: 0, g: 0x80, b: 0x80 };
+                        console.write_str(data, text_colour, background_colour);
+                    }
+                }
             });
         }
     }
