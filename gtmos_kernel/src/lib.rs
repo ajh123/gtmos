@@ -15,6 +15,7 @@
 pub mod drivers;
 pub mod graphics;
 pub mod platform;
+pub mod console;
 
 use core::panic::PanicInfo;
 

@@ -1,5 +1,3 @@
-// graphics.rs
-
 use core::cell::RefCell;
 
 use crate::drivers::framebuffer::{Framebuffer, FramebufferIndex, Pixel, FramebufferMemory};
@@ -14,7 +12,7 @@ pub struct GraphicsAPI<'a> {
 
 impl<'a> GraphicsAPI<'a> {
     /// Creates the graphics api from a framebuffer.
-    /// 
+    ///
     /// ## Example
     /// ```rust
     /// fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
@@ -33,7 +31,7 @@ impl<'a> GraphicsAPI<'a> {
     ///     }
     /// }
     /// ```
-    /// 
+    ///
     /// In this example, a hypotetical `kernel_main` is creating an instance of the grahpics API using the frambuffer from the bootloader.
     pub fn new(framebuffer: RefCell<FramebufferMemory<'a>>) -> Self {
         GraphicsAPI {
@@ -42,7 +40,7 @@ impl<'a> GraphicsAPI<'a> {
     }
 
     /// Plot a pixel at the specified location (x, y) with the given colour.
-    /// 
+    ///
     /// ## Example
     /// ```rust
     /// graphics_api.plot_pixel(50, 50,  Pixel {
@@ -51,7 +49,7 @@ impl<'a> GraphicsAPI<'a> {
     ///     r: 0x00
     /// });
     /// ```
-    /// 
+    ///
     /// In this example, a teal coloured pixel is plotted at 50, 50 on the screen.
     pub fn plot_pixel(&mut self, x: usize, y: usize, pixel: Pixel) {
         let mut fb = self.framebuffer.borrow_mut();
@@ -60,7 +58,7 @@ impl<'a> GraphicsAPI<'a> {
     }
 
     /// Draw a filled rectangle at the specified location with the given colour.
-    /// 
+    ///
     /// ## Example
     /// ```rust
     /// graphics_api.draw_filled_rectangle(0, 0, width, height, Pixel {
@@ -69,7 +67,7 @@ impl<'a> GraphicsAPI<'a> {
     ///     r: 0x00
     /// });
     /// ```
-    /// 
+    ///
     /// In this example, a teal coloured rectangle will fill the screen, assuming `width` is the width of the scrren and `height` is the height of the screen.
     pub fn draw_filled_rectangle(&mut self, x: usize, y: usize, width: usize, height: usize, pixel: Pixel) {
         for i in y..(y + height) {
@@ -80,7 +78,7 @@ impl<'a> GraphicsAPI<'a> {
     }
 
     /// Draw a line from (x1, y1) to (x2, y2) with the given colour.
-    /// 
+    ///
     /// ## Example
     /// ```
     /// graphics_api.draw_line(10, 10, 100, 100, Pixel {
@@ -89,7 +87,7 @@ impl<'a> GraphicsAPI<'a> {
     ///     r: 0xFF
     /// });
     /// ```
-    /// 
+    ///
     /// In this example a red coloured line is drawn from 10, 10 on the scrren to 100, 100 on the scrren.
     pub fn draw_line(&mut self, x1: usize, y1: usize, x2: usize, y2: usize, pixel: Pixel) {
         let dx = (x2 as isize - x1 as isize).abs();
@@ -135,7 +133,7 @@ impl<'a> GraphicsAPI<'a> {
 
     /// Draws a character at a given location with a font size.
     /// All characters supported by [`font8x8::BASIC_FONTS`] can be used.
-    /// 
+    ///
     /// ## Example
     /// ```
     /// graphics_api.draw_char(
@@ -155,7 +153,7 @@ impl<'a> GraphicsAPI<'a> {
     ///     1
     /// );
     /// ```
-    /// 
+    ///
     /// In this example a white letter "A" is drawn at 0, 0 with font size 1 and a black backround colour.
     pub fn draw_char(&mut self, x: usize, y: usize, c: char, text: Pixel, background: Pixel, font_size: usize) {
         if let Some(glyph) = BASIC_FONTS.get(c) {
@@ -164,7 +162,7 @@ impl<'a> GraphicsAPI<'a> {
 
             for gy in 0..glyph_height {
                 for gx in 0..glyph_width {
-                    let bit = glyph[gy] & (1 << (7 - gx));
+                    let bit = glyph[gy] & (1 << gx);
                     if bit != 0 {
                         for dx in 0..font_size {
                             for dy in 0..font_size {
@@ -185,7 +183,7 @@ impl<'a> GraphicsAPI<'a> {
 
     /// Draws a character at a given location with a font size with a transparent transparent.
     /// All characters supported by [`font8x8::BASIC_FONTS`] can be used.
-    /// 
+    ///
     /// ## Example
     /// ```
     /// graphics_api.draw_char_transparent(
@@ -200,8 +198,8 @@ impl<'a> GraphicsAPI<'a> {
     ///     1
     /// );
     /// ```
-    /// 
-    /// In this example a white letter "A" is drawn at 0, 0 with font size 1. The background will be based of what was behind the character when you called 
+    ///
+    /// In this example a white letter "A" is drawn at 0, 0 with font size 1. The background will be based of what was behind the character when you called
     /// this function.
     pub fn draw_char_transparent(&mut self, x: usize, y: usize, c: char, text: Pixel, font_size: usize) {
         if let Some(glyph) = BASIC_FONTS.get(c) {
@@ -210,7 +208,7 @@ impl<'a> GraphicsAPI<'a> {
 
             for gy in 0..glyph_height {
                 for gx in 0..glyph_width {
-                    let bit = glyph[gy] & (1 << (7 - gx));
+                    let bit = glyph[gy] & (1 << gx);
                     if bit != 0 {
                         for dx in 0..font_size {
                             for dy in 0..font_size {
@@ -221,5 +219,15 @@ impl<'a> GraphicsAPI<'a> {
                 }
             }
         }
+    }
+
+    /// Get the width of the framebuffer.
+    pub fn get_width(&self) -> usize {
+        self.framebuffer.borrow().width
+    }
+
+    /// Get the height of the framebuffer.
+    pub fn get_height(&self) -> usize {
+        self.framebuffer.borrow().height
     }
 }
