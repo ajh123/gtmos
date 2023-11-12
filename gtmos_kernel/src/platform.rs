@@ -25,26 +25,34 @@ impl<T: SubSystem> Platform<T> {
 }
 
 // Global static reference to the platform
-static mut PLATFORM: Option<RefCell<Option<&'static dyn SubSystem>>> = None;
+static mut PLATFORM: Option<RefCell<Option<&'static mut dyn SubSystem>>> = None;
 
 // Function to set the static reference in the main crate
+#[allow(mutable_transmutes)]
 pub fn set_platform<T: SubSystem>(platform: Platform<T>) {
     unsafe {
         if PLATFORM.is_none() {
-            let static_ref: &'static dyn SubSystem =
+            let static_ref: &'static mut dyn SubSystem =
                 mem::transmute(&platform.sub_system as &dyn SubSystem);
             PLATFORM = Some(RefCell::new(Some(static_ref)));
         }
     }
 }
 
-#[allow(mutable_transmutes)]
 pub fn get_sub_system() -> Option<&'static mut dyn SubSystem> {
     unsafe {
-        PLATFORM
-            .as_ref()?
-            .borrow_mut()
-            .take()
-            .map(|s| mem::transmute(s))
+        let r: Option<&'static mut dyn SubSystem> = PLATFORM
+            .as_mut()
+            .and_then(|p| {
+                // Take out the inner value and replace it with None temporarily
+                let inner_ref = p.borrow_mut().take()?;
+
+                // Convert the reference to 'static
+                let static_ref: &'static mut (dyn SubSystem + 'static) = mem::transmute(inner_ref);
+
+                // Create a reference with 'static lifetime
+                Some(static_ref)
+            });
+        return r;
     }
 }
