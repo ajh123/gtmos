@@ -1,4 +1,4 @@
-use gtmos_kernel::{platform::{CPU, get_platform}, drivers::framebuffer::Pixel};
+use gtmos_kernel::{platform::SubSystem, drivers::framebuffer::Pixel, console::Console};
 use uart_16550::SerialPort;
 use spin::Mutex;
 use crate::{interrupts, gdt};
@@ -16,9 +16,19 @@ lazy_static! {
 }
 
 
-pub struct X86_64Cpu;
+pub struct X86_64SubSystem {
+    pub console: Option<Console<'static>>,
+}
 
-impl CPU for X86_64Cpu {
+impl X86_64SubSystem {
+    pub fn new() -> Self {
+        let system = X86_64SubSystem { console: None };
+        system.initialise();
+        return system;
+    }
+}
+
+impl SubSystem for X86_64SubSystem {
     fn initialise(&self) {
         gdt::initialise();
         interrupts::init_idt();
@@ -32,7 +42,7 @@ impl CPU for X86_64Cpu {
         }
     }
 
-    fn write(&self, dest: &str, data: &str) {
+    fn write(&mut self, dest: &str, data: &str) {
         use x86_64::instructions::interrupts;
         if dest == "serial" {
             use core::fmt::Write;
@@ -45,19 +55,27 @@ impl CPU for X86_64Cpu {
             });
         }
         if dest == "vga_console" {
-            interrupts::without_interrupts(|| {
-                if let Some(platform_from_get) = get_platform::<X86_64Cpu>() {
-                    if let Some(console) = &mut platform_from_get.console {
-                        let text_colour = Pixel { r: 0xFF, g: 0xFF, b: 0xFF };
-                        let background_colour = Pixel { r: 0, g: 0x80, b: 0x80 };
-                        console.write_str(data, text_colour, background_colour);
-                    }
-                }
-            });
+            let text_colour = Pixel { r: 0xFF, g: 0xFF, b: 0xFF };
+            let background_colour = Pixel { r: 0, g: 0x80, b: 0x80 };
+            if let Some(console) = self.get_console() {
+                interrupts::without_interrupts(|| {
+                console.write_str(data, text_colour, background_colour);
+                });
+            }
         }
     }
 
     // fn read(&self, dest: &str) -> &str {
     //     return "";
     // }
+
+
+    fn set_console(&mut self, console: Option<Console<'static>>) {
+        self.console = console;
+    }
+
+    fn get_console(&mut self) -> Option<&mut Console<'static>> {
+        return self.console.as_mut()
+    }
+
 }

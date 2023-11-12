@@ -15,12 +15,10 @@
 use core::panic::PanicInfo;
 use gtmos_kernel;
 use gtmos_kernel::graphics::GraphicsAPI;
-use gtmos_kernel::platform::{Platform, set_platform, get_cpu};
-use cpu::X86_64Cpu;
+use gtmos_kernel::platform::{Platform, set_platform, get_sub_system};
+use gtmos_kernel_x86_64::system::X86_64SubSystem;
 
-pub mod interrupts;
-pub mod cpu;
-pub mod gdt;
+
 
 static mut GRAPHICS_API: Option<GraphicsAPI> = None;
 
@@ -29,12 +27,12 @@ bootloader_api::entry_point!(kernel_main);
 #[cfg(not(test))]
 fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
     use core::cell::RefCell;
-    use gtmos_kernel::{drivers::framebuffer::Pixel, console::Console, platform::get_platform};
+    use gtmos_kernel::{drivers::framebuffer::Pixel, console::Console};
 
-    let platform = Platform::new(X86_64Cpu);
+    let platform = Platform::new(X86_64SubSystem::new());
     set_platform(platform);
 
-    if let Some(my_cpu) = get_cpu() {
+    if let Some(my_cpu) = get_sub_system() {
         if let Some(framebuffer) = boot_info.framebuffer.as_mut() {
             let width = {framebuffer.info().width};
             let height = {framebuffer.info().height};
@@ -60,12 +58,13 @@ fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
                 }
             }
 
-            // Set the console directly
-            // if let Some(platform) = get_platform::<X86_64Cpu>() {
-            //     unsafe {
-            //         platform.set_console(Console::new(GRAPHICS_API.as_mut().unwrap(), 2));
-            //     }
-            // }
+            // Set the my_subsystem directly
+            if let Some(my_subsystem) = get_sub_system() {
+                unsafe {
+                    let console_option = Some(Console::new(GRAPHICS_API.as_mut().unwrap(), 2));
+                    my_subsystem.set_console(console_option.map(|c| c));
+                }
+            }
         }
         // if let Some(platform_from_get) = get_platform::<X86_64Cpu>() {
         //     // platform_from_get.console = _console;
@@ -78,6 +77,15 @@ fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
         //         console.write_str("Agj", text_colour, background_colour);
         //     }
         // }
+        if let Some(system) = get_sub_system() {
+            if let Some(console) = system.get_console() {
+                let text_colour = Pixel { r: 0xFF, g: 0xFF, b: 0xFF };
+                let background_colour = Pixel { r: 0, g: 0x80, b: 0x80 };
+                console.write_str("A", text_colour, background_colour);
+                console.write_str("A\n", text_colour, background_colour);
+                console.write_str("Agj", text_colour, background_colour);
+            }
+        }
 
         // gtmos_kernel::println!("AAAgj");
         gtmos_kernel::serial_println!("Welcome to GT-MOS!\nGT-MOS is (c) 2023 Samuel Hulme, All rights reserved.");
@@ -94,9 +102,9 @@ fn kernel_main(boot_info: &'static mut bootloader_api::BootInfo) -> ! {
 
 #[cfg(test)]
 pub(crate) fn kernel_main(_boot_info: &'static mut bootloader_api::BootInfo) -> ! {
-    let platform = Platform::new(X86_64Cpu);
+    let platform = Platform::new(X86_64SubSystem::new());
     set_platform(platform);
-    if let Some(my_cpu) = get_cpu() {
+    if let Some(my_cpu) = get_sub_system() {
         test_main();
         my_cpu.halt();
     }

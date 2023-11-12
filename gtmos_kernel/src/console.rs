@@ -1,4 +1,4 @@
-use core::fmt::Write;
+// use core::fmt::Write;
 use core::str;
 
 use crate::drivers::framebuffer::Pixel;

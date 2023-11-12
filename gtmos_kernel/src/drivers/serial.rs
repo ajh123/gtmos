@@ -1,6 +1,6 @@
 use core::fmt;
 
-use crate::platform::get_cpu;
+use crate::platform::get_sub_system;
 
 #[doc(hidden)]
 pub fn _print(args: ::core::fmt::Arguments) {
@@ -11,7 +11,7 @@ pub fn _print(args: ::core::fmt::Arguments) {
 struct Writer {}
 impl fmt::Write for Writer {
     fn write_str(&mut self, s: &str) -> fmt::Result {
-        if let Some(cpu) = get_cpu() {
+        if let Some(cpu) = get_sub_system() {
             cpu.write("serial", s);
         }
         Ok(())

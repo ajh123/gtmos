@@ -1,70 +1,50 @@
 use core::{cell::RefCell, mem};
 use crate::console::Console;
-
-pub trait CPU {
+pub trait SubSystem {
     fn initialise(&self);
     fn halt(&self);
-    fn write(&self, dest: &str, data: &str);
+    fn write(&mut self, dest: &str, data: &str);
     // fn read(&self, dest: &str) -> &str;
+    fn set_console(&mut self, console: Option<Console<'static>>);
+    fn get_console(&mut self) -> Option<&mut Console<'static>>;
 }
 
-pub struct Platform<T: CPU> {
-    pub cpu: T,
-    pub console: Option<Console<'static>>,
+pub struct Platform<T: SubSystem> {
+    pub sub_system: T
 }
 
-impl<T: CPU> Platform<T> {
-    pub fn new(cpu: T) -> Self {
-        Platform { cpu, console: None }
-    }
-
-    pub fn set_console(&mut self, console: Console<'static>) {
-        self.console = Some(console);
-    }
-
-    pub fn initialise(&self) {
-        self.cpu.initialise();
+impl<T: SubSystem> Platform<T> {
+    pub fn new(sub_system: T) -> Self {
+        Platform { sub_system }
     }
 
     pub fn halt(&self) -> ! {
-        self.cpu.halt();
+        self.sub_system.halt();
         loop {}
     }
 }
 
 // Global static reference to the platform
-static mut PLATFORM: Option<RefCell<Option<&'static dyn CPU>>> = None;
+static mut PLATFORM: Option<RefCell<Option<&'static dyn SubSystem>>> = None;
 
 // Function to set the static reference in the main crate
-pub fn set_platform<T: CPU>(platform: Platform<T>) {
+pub fn set_platform<T: SubSystem>(platform: Platform<T>) {
     unsafe {
         if PLATFORM.is_none() {
-            let static_ref: &'static dyn CPU =
-                mem::transmute(&platform.cpu as &dyn CPU);
+            let static_ref: &'static dyn SubSystem =
+                mem::transmute(&platform.sub_system as &dyn SubSystem);
             PLATFORM = Some(RefCell::new(Some(static_ref)));
-            platform.initialise();
         }
     }
 }
 
-// Function to get a reference to the platform's cpu
-pub fn get_cpu() -> Option<&'static dyn CPU> {
+#[allow(mutable_transmutes)]
+pub fn get_sub_system() -> Option<&'static mut dyn SubSystem> {
     unsafe {
         PLATFORM
-            .as_ref()
-            .and_then(|p| p.borrow().as_ref().cloned())
-    }
-}
-
-// Function to get a reference to the platform itself
-pub fn get_platform<T: CPU + 'static>() -> Option<&'static mut Platform<T>> {
-    unsafe {
-        PLATFORM
-            .as_ref()
-            .and_then(|p| {
-                let mut mut_ref = p.borrow_mut();
-                mut_ref.as_mut().map(|platform| platform as *mut _ as *mut Platform<T>)
-            })
-            .map(|platform_ptr| &mut *platform_ptr)
+            .as_ref()?
+            .borrow_mut()
+            .take()
+            .map(|s| mem::transmute(s))
     }
 }
